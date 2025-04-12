@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pencatatan Panen Sawit - PalmHarvest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <p>Memuat Aplikasi...</p>
+    </div>
+
+    <header class="animated-header">
+        <div class="header-content">
+            <div class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+            <div class="logo-container">
+                <i class="fas fa-palm-tree logo-icon"></i>
+                <h1>Sawit<span>Smart</span></h1>
+            </div>
+            <div class="header-info">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="currentUser">Admin</span>
+                </div>
+                <div class="current-date" id="currentDate"></div>
+            </div>
+        </div>
+    </header>
+    <nav class="sidebar">
+        <ul>
+            <li class="active"><a href="#dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="#input-data"><i class="fas fa-edit"></i> Input Data Panen</a></li>
+            <li><a href="#data-panen"><i class="fas fa-database"></i> Data Panen</a></li>
+            <li><a href="#laporan"><i class="fas fa-chart-bar"></i> Laporan</a></li>
+            <li><a href="#pemanen"><i class="fas fa-users"></i> Data Pemanen</a></li>
+            <li><a href="#settings"><i class="fas fa-cog"></i> Pengaturan</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+            <div class="dashboard-cards">
+                <div class="card animate-card">
+                    <div class="card-icon" style="background-color: #4CAF50;">
+                        <i class="fas fa-weight-hanging"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>Total Panen Hari Ini</h3>
+                        <p id="todayHarvest">0 Kg</p>
+                    </div>
+                </div>
+                <div class="card animate-card">
+                    <div class="card-icon" style="background-color: #2196F3;">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>Total Panen Minggu Ini</h3>
+                        <p id="weekHarvest">0 Kg</p>
+                    </div>
+                </div>
+                <div class="card animate-card">
+                    <div class="card-icon" style="background-color: #FF9800;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>Jumlah Pemanen</h3>
+                        <p id="totalHarvesters">0</p>
+                    </div>
+                </div>
+                <div class="card animate-card">
+                    <div class="card-icon" style="background-color: #9C27B0;">
+                        <i class="fas fa-tractor"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>Luas Lahan</h3>
+                        <p>250 Ha</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-charts">
+                <div class="chart-container">
+                    <canvas id="harvestChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="harvesterPerformanceChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Input Data Section -->
+        <section id="input-data" class="content-section">
+            <h2><i class="fas fa-edit"></i> Input Data Panen</h2>
+            <div class="form-container">
+                <form id="harvestForm">
+                    <div class="form-group">
+                        <label for="harvesterId"><i class="fas fa-id-card"></i> ID Pemanen</label>
+                        <select id="harvesterId" required>
+                            <option value="">Pilih Pemanen</option>
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="harvestDate"><i class="fas fa-calendar-day"></i> Tanggal Panen</label>
+                        <input type="date" id="harvestDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="blockNumber"><i class="fas fa-map-marked-alt"></i> Blok Lahan</label>
+                        <select id="blockNumber" required>
+                            <option value="">Pilih Blok Lahan</option>
+                            <option value="A1">Blok A1</option>
+                            <option value="A2">Blok A2</option>
+                            <option value="B1">Blok B1</option>
+                            <option value="B2">Blok B2</option>
+                            <option value="C1">Blok C1</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="harvestWeight"><i class="fas fa-weight-hanging"></i> Berat Panen (Kg)</label>
+                        <input type="number" id="harvestWeight" min="0" step="0.1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fruitQuality"><i class="fas fa-star"></i> Kualitas Buah</label>
+                        <select id="fruitQuality" required>
+                            <option value="">Pilih Kualitas</option>
+                            <option value="A">A - Sangat Baik</option>
+                            <option value="B">B - Baik</option>
+                            <option value="C">C - Cukup</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes"><i class="fas fa-sticky-note"></i> Catatan</label>
+                        <textarea id="notes" rows="3"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-save"></i> Simpan Data
+                    </button>
+                </form>
+                
+                <div class="form-preview">
+                    <h3>Pratinjau Data</h3>
+                    <div class="preview-card" id="previewCard">
+                        <div class="preview-header">
+                            <i class="fas fa-clipboard-check"></i>
+                            <h4>Data Panen Sawit</h4>
+                        </div>
+                        <div class="preview-body">
+                            <p><strong>Pemanen:</strong> <span id="previewHarvester">-</span></p>
+                            <p><strong>Tanggal:</strong> <span id="previewDate">-</span></p>
+                            <p><strong>Blok Lahan:</strong> <span id="previewBlock">-</span></p>
+                            <p><strong>Berat:</strong> <span id="previewWeight">-</span> Kg</p>
+                            <p><strong>Kualitas:</strong> <span id="previewQuality">-</span></p>
+                            <p><strong>Catatan:</strong> <span id="previewNotes">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Panen Section -->
+        <section id="data-panen" class="content-section">
+            <h2><i class="fas fa-database"></i> Data Panen</h2>
+            <div class="data-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchData" placeholder="Cari data panen...">
+                </div>
+                <div class="filter-options">
+                    <select id="filterMonth">
+                        <option value="">Semua Bulan</option>
+                        <option value="1">Januari</option>
+                        <option value="2">Februari</option>
+                        <!-- Other months -->
+                    </select>
+                    <select id="filterHarvester">
+                        <option value="">Semua Pemanen</option>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                    <button id="exportBtn" class="export-btn">
+                        <i class="fas fa-file-excel"></i> Ekspor ke Excel
+                    </button>
+                </div>
+            </div>
+            
+            <div class="data-table-container">
+                <table id="harvestDataTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>ID Pemanen</th>
+                            <th>Nama Pemanen</th>
+                            <th>Tanggal</th>
+                            <th>Blok Lahan</th>
+                            <th>Berat (Kg)</th>
+                            <th>Kualitas</th>
+                            <th>Catatan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination">
+                <button id="prevPage"><i class="fas fa-chevron-left"></i></button>
+                <span id="pageInfo">Halaman 1 dari 1</span>
+                <button id="nextPage"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </section>
+
+        <!-- Laporan Section -->
+        <section id="laporan" class="content-section">
+            <h2><i class="fas fa-chart-bar"></i> Laporan</h2>
+            <div class="report-controls">
+                <div class="report-period">
+                    <label for="reportStartDate">Dari:</label>
+                    <input type="date" id="reportStartDate">
+                    
+                    <label for="reportEndDate">Sampai:</label>
+                    <input type="date" id="reportEndDate">
+                    
+                    <button id="generateReport" class="generate-btn">
+                        <i class="fas fa-sync-alt"></i> Generate Laporan
+                    </button>
+                </div>
+                <button id="exportReportBtn" class="export-btn">
+                    <i class="fas fa-file-pdf"></i> Ekspor ke PDF
+                </button>
+            </div>
+            
+            <div class="report-summary">
+                <div class="summary-card">
+                    <h3>Total Panen</h3>
+                    <p id="reportTotalHarvest">0 Kg</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Rata-rata Harian</h3>
+                    <p id="reportDailyAverage">0 Kg</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Kualitas Terbaik</h3>
+                    <p id="reportBestQuality">-</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Blok Paling Produktif</h3>
+                    <p id="reportBestBlock">-</p>
+                </div>
+            </div>
+            
+            <div class="report-charts">
+                <div class="chart-container">
+                    <canvas id="reportHarvestChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="reportQualityChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="detailed-report">
+                <h3>Detail Panen per Pemanen</h3>
+                <table id="detailedReportTable">
+                    <thead>
+                        <tr>
+                            <th>Pemanen</th>
+                            <th>Total Panen (Kg)</th>
+                            <th>Rata-rata Harian</th>
+                            <th>Kualitas Terbaik</th>
+                            <th>Blok Favorit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Data Pemanen Section -->
+        <section id="pemanen" class="content-section">
+            <h2><i class="fas fa-users"></i> Data Pemanen</h2>
+            <div class="harvester-actions">
+                <button id="addHarvesterBtn" class="add-btn">
+                    <i class="fas fa-user-plus"></i> Tambah Pemanen
+                </button>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchHarvester" placeholder="Cari pemanen...">
+                </div>
+            </div>
+            
+            <div class="harvester-table-container">
+                <table id="harvesterTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>ID Pemanen</th>
+                            <th>Nama Lengkap</th>
+                            <th>No. HP</th>
+                            <th>Tanggal Bergabung</th>
+                            <th>Total Panen</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Add Harvester Modal -->
+            <div id="harvesterModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h3><i class="fas fa-user-plus"></i> Tambah Pemanen Baru</h3>
+                    <form id="harvesterForm">
+                        <div class="form-group">
+                            <label for="newHarvesterId"><i class="fas fa-id-card"></i> ID Pemanen</label>
+                            <input type="text" id="newHarvesterId" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newHarvesterName"><i class="fas fa-user"></i> Nama Lengkap</label>
+                            <input type="text" id="newHarvesterName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newHarvesterPhone"><i class="fas fa-phone"></i> Nomor HP</label>
+                            <input type="tel" id="newHarvesterPhone">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newHarvesterJoinDate"><i class="fas fa-calendar-alt"></i> Tanggal Bergabung</label>
+                            <input type="date" id="newHarvesterJoinDate" required>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-save"></i> Simpan Data
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings" class="content-section">
+            <h2><i class="fas fa-cog"></i> Pengaturan</h2>
+            <div class="settings-container">
+                <div class="settings-card">
+                    <h3><i class="fas fa-user-shield"></i> Keamanan Akun</h3>
+                    <form id="securityForm">
+                        <div class="form-group">
+                            <label for="currentPassword">Password Saat Ini</label>
+                            <input type="password" id="currentPassword">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">Password Baru</label>
+                            <input type="password" id="newPassword">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Konfirmasi Password</label>
+                            <input type="password" id="confirmPassword">
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-key"></i> Update Password
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="settings-card">
+                    <h3><i class="fas fa-sliders-h"></i> Pengaturan Aplikasi</h3>
+                    <form id="appSettingsForm">
+                        <div class="form-group toggle-group">
+                            <label>Notifikasi</label>
+                            <label class="switch">
+                                <input type="checkbox" id="notificationsToggle" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group toggle-group">
+                            <label>Mode Gelap</label>
+                            <label class="switch">
+                                <input type="checkbox" id="darkModeToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dataLimit">Limit Data per Halaman</label>
+                            <select id="dataLimit">
+                                <option value="10">10</option>
+                                <option value="25" selected>25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-save"></i> Simpan Pengaturan
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="settings-card">
+                    <h3><i class="fas fa-database"></i> Manajemen Data</h3>
+                    <div class="data-actions">
+                        <button id="backupBtn" class="action-btn">
+                            <i class="fas fa-file-export"></i> Backup Data
+                        </button>
+                        <button id="restoreBtn" class="action-btn">
+                            <i class="fas fa-file-import"></i> Restore Data
+                        </button>
+                        <button id="resetBtn" class="action-btn danger">
+                            <i class="fas fa-trash-alt"></i> Reset Data
+                        </button>
+                    </div>
+                    <div class="data-info">
+                        <p><strong>Total Data Panen:</strong> <span id="totalHarvestData">0</span> records</p>
+                        <p><strong>Total Pemanen:</strong> <span id="totalHarvesterData">0</span> records</p>
+                        <p><strong>Ukuran Penyimpanan:</strong> <span id="storageSize">0 KB</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <script src="script.js"></script>
+    <script src="export.js"></script>
+
+    <script>
+        // Cek apakah user sudah login
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Update tampilan berdasarkan role user
+            updateUIForUserRole(currentUser);
+        });
+    
+        // Fungsi untuk update UI berdasarkan role user
+        function updateUIForUserRole(user) {
+            // Tampilkan nama user di header
+            document.getElementById('currentUser').textContent = user.name;
+            
+            // Sembunyikan menu yang tidak boleh diakses
+            if (user.role === 'pemanen') {
+                // Sembunyikan menu yang tidak perlu
+                document.querySelector('a[href="#pemanen"]').parentElement.style.display = 'none';
+                document.querySelector('a[href="#settings"]').parentElement.style.display = 'none';
+                
+                // Set ID pemanen otomatis di form input
+                const harvesterIdSelect = document.getElementById('harvesterId');
+                if (harvesterIdSelect && user.harvesterId) {
+                    harvesterIdSelect.value = user.harvesterId;
+                    harvesterIdSelect.disabled = true;
+                    updatePreview();
+                }
+            }
+        }
+    
+        // Fungsi logout
+        function logout() {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+    
+        // Tambahkan tombol logout di header (tambahkan di HTML header)
+        // <div class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+    </script>
+
+    
+</body>
+</html>

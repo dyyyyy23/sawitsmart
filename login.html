@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SawitSmart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('assets/images/sawit-bg.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .login-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .logo {
+            margin-bottom: 30px;
+        }
+        
+        .logo i {
+            font-size: 3rem;
+            color: #4CAF50;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            margin-top: 10px;
+            color: #333;
+        }
+        
+        .logo span {
+            color: #4CAF50;
+        }
+        
+        .login-form .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .login-form .input-group {
+            position: relative;
+        }
+        
+        .login-form .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .login-form input:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+        
+        .login-btn {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            background-color: #388E3C;
+        }
+        
+        .forgot-password {
+            display: block;
+            margin-top: 15px;
+            color: #4CAF50;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            color: #F44336;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        .footer-text {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <i class="fas fa-palm-tree"></i>
+            <h1>Sawit<span>Smart</span></h1>
+        </div>
+        
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" placeholder="Masukkan username" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Masukkan password" required>
+                </div>
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                Username atau password salah
+            </div>
+            
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Masuk
+            </button>
+            
+            <a href="#" class="forgot-password">Lupa password?</a>
+        </form>
+        
+        <p class="footer-text">© 2025 Smart Sawit - Sistem Pencatatan Panen Sawit</p>
+    </div>
+
+    <script>
+        // Data pengguna (dalam implementasi nyata, ini harus di backend)
+        const users = [
+            { 
+                id: 1, 
+                username: 'admin', 
+                password: 'admin', 
+                name: 'Administrator', 
+                role: 'admin',
+                phone: '081234567890'
+            },
+            { 
+                id: 2, 
+                username: 'pemanen1', 
+                password: 'pemanen1', 
+                name: 'Nur Jannah', 
+                role: 'pemanen',
+                harvesterId: 'P001',
+                phone: '082345678901'
+            },
+            { 
+                id: 3, 
+                username: 'pemanen2', 
+                password: 'pemanen2', 
+                name: 'Nayla', 
+                role: 'pemanen',
+                harvesterId: 'P002',
+                phone: '083456789012'
+            }
+        ];
+
+        // Simpan data pengguna ke localStorage jika belum ada
+        if (!localStorage.getItem('users')) {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        // Form login
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Cek kredensial
+            const authenticatedUser = authenticateUser(username, password);
+            
+            if (authenticatedUser) {
+                // Simpan user yang login ke sessionStorage
+                sessionStorage.setItem('currentUser', JSON.stringify(authenticatedUser));
+                
+                // Redirect ke halaman utama
+                window.location.href = 'index.html';
+            } else {
+                // Tampilkan pesan error
+                errorMessage.style.display = 'block';
+                
+                // Animasi shake
+                loginForm.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    loginForm.style.animation = '';
+                }, 500);
+            }
+        });
+
+        // Fungsi autentikasi
+        function authenticateUser(username, password) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            return users.find(user => 
+                user.username === username && user.password === password
+            );
+        }
+
+        // Style untuk animasi shake
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+</body>
+</html>
